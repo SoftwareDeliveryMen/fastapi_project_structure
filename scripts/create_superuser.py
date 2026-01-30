@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.user import User
 from app.core.security import get_password_hash
+from app.utils.helpers import is_valid_email, is_strong_password, sanitize_string
 
 def create_superuser():
     """Interactive superuser creation"""
@@ -17,12 +18,26 @@ def create_superuser():
     
     username = input("Username: ")
     email = input("Email: ")
+    
+    # Validate email
+    if not is_valid_email(email):
+        print("❌ Invalid email format!")
+        return
+    
     password = getpass("Password: ")
     password_confirm = getpass("Confirm password: ")
     
     if password != password_confirm:
         print("❌ Passwords don't match!")
         return
+    
+    # Validate password strength
+    if not is_strong_password(password):
+        print("❌ Password must contain at least 8 characters, including uppercase, lowercase, and a number!")
+        return
+    
+    # Sanitize username
+    username = sanitize_string(username)
     
     db: Session = SessionLocal()
     

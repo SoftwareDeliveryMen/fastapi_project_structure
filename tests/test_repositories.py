@@ -6,7 +6,7 @@ def test_create_user(db):
     user_create = UserCreate(
         email="repo@example.com",
         username="repouser",
-        password="password123",
+        password="RepoPassword123",
         is_active=True
     )
     user = repo.create(user_create)

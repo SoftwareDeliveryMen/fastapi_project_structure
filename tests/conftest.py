@@ -48,7 +48,7 @@ def test_user(db):
     user = User(
         email="test@example.com",
         username="testuser",
-        hashed_password=get_password_hash("testpassword123"),
+        hashed_password=get_password_hash("TestPassword123"),
         is_active=True,
         is_superuser=False
     )
@@ -63,7 +63,7 @@ def test_superuser(db):
     user = User(
         email="admin@example.com",
         username="admin",
-        hashed_password=get_password_hash("adminpassword123"),
+        hashed_password=get_password_hash("AdminPassword123"),
         is_active=True,
         is_superuser=True
     )
@@ -76,7 +76,7 @@ def test_superuser(db):
 def user_token(client, test_user):
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": "testuser", "password": "testpassword123"}
+        data={"username": "testuser", "password": "TestPassword123"}
     )
     return response.json()["access_token"]
 
@@ -84,6 +84,6 @@ def user_token(client, test_user):
 def superuser_token(client, test_superuser):
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": "admin", "password": "adminpassword123"}
+        data={"username": "admin", "password": "AdminPassword123"}
     )
     return response.json()["access_token"]
