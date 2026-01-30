@@ -118,6 +118,7 @@ def test_create_user_weak_password(client):
         }
     )
     assert response.status_code == 422
+    assert "detail" in response.json()
     
     # Too short
     response = client.post(
@@ -130,6 +131,7 @@ def test_create_user_weak_password(client):
         }
     )
     assert response.status_code == 422
+    assert "detail" in response.json()
     
     # No numbers
     response = client.post(
@@ -142,6 +144,7 @@ def test_create_user_weak_password(client):
         }
     )
     assert response.status_code == 422
+    assert "detail" in response.json()
 
 def test_create_user_with_harmful_chars_in_username(client):
     """Test that harmful characters are sanitized from username"""

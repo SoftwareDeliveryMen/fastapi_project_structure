@@ -3,6 +3,7 @@
 help:
 	@echo "Available commands:"
 	@echo "  install       - Install dependencies"
+	@echo "  install-dev   - Install development dependencies"
 	@echo "  dev           - Run development server"
 	@echo "  prod          - Run production server"
 	@echo "  test          - Run tests"

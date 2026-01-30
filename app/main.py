@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from sqlalchemy.exc import SQLAlchemyError
 from contextlib import asynccontextmanager
 
@@ -39,9 +39,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/swagger",
-    redoc_url="/redoc",
+    redoc_url=None,  # Disable default ReDoc to use custom
     lifespan=lifespan
 )
 
@@ -77,6 +76,33 @@ async def root():
         "version": settings.VERSION,
         "docs": f"{settings.API_V1_STR}/docs"
     }
+
+# Custom ReDoc endpoint with stable CDN
+@app.get("/redoc", response_class=HTMLResponse, include_in_schema=False)
+async def redoc_html():
+    """ReDoc documentation"""
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{settings.PROJECT_NAME} - ReDoc</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="https://cdn.redoc.ly/redoc/logo-mini.svg">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+            }}
+        </style>
+    </head>
+    <body>
+        <redoc spec-url="/openapi.json"></redoc>
+        <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+    </body>
+    </html>
+    """
 
 # Logging middleware
 @app.middleware("http")

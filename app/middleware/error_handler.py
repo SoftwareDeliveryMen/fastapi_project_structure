@@ -6,11 +6,22 @@ import traceback
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Handle validation errors"""
+    errors = []
+    for error in exc.errors():
+        error_dict = {
+            "loc": error.get("loc"),
+            "msg": error.get("msg"),
+            "type": error.get("type")
+        }
+        # Handle ctx if it exists (additional error context)
+        if "ctx" in error:
+            error_dict["ctx"] = {k: str(v) for k, v in error["ctx"].items()}
+        errors.append(error_dict)
+    
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
-            "detail": exc.errors(),
-            "body": exc.body
+            "detail": errors
         }
     )
 

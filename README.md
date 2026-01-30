@@ -8,4 +8,7 @@ pip install -r requirements-dev.txt
 
 # run
 venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# help
+make help
 ```
