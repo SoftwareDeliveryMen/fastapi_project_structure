@@ -41,6 +41,7 @@ app = FastAPI(
     version=settings.VERSION,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/swagger",
+    redoc_url="/redoc",
     lifespan=lifespan
 )
 

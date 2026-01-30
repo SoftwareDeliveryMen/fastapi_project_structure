@@ -4,7 +4,7 @@ def test_create_user(client):
         json={
             "email": "newuser@example.com",
             "username": "newuser",
-            "password": "newpassword123",
+            "password": "NewPassword123",
             "is_active": True
         }
     )
@@ -21,11 +21,11 @@ def test_create_user_duplicate_email(client, test_user):
         json={
             "email": "test@example.com",
             "username": "anotheruser",
-            "password": "password123",
+            "password": "Password123",
             "is_active": True
         }
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
     assert response.json()["detail"] == "Email already registered"
 
 def test_create_user_duplicate_username(client, test_user):
@@ -34,11 +34,11 @@ def test_create_user_duplicate_username(client, test_user):
         json={
             "email": "another@example.com",
             "username": "testuser",
-            "password": "password123",
+            "password": "Password123",
             "is_active": True
         }
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
     assert response.json()["detail"] == "Username already taken"
 
 def test_read_current_user(client, user_token):
@@ -104,3 +104,59 @@ def test_delete_user_as_regular_user(client, user_token, test_user):
         headers={"Authorization": f"Bearer {user_token}"}
     )
     assert response.status_code == 403
+
+def test_create_user_weak_password(client):
+    """Test that weak passwords are rejected"""
+    # No uppercase
+    response = client.post(
+        "/api/v1/users/",
+        json={
+            "email": "weak@example.com",
+            "username": "weakuser",
+            "password": "password123",
+            "is_active": True
+        }
+    )
+    assert response.status_code == 422
+    
+    # Too short
+    response = client.post(
+        "/api/v1/users/",
+        json={
+            "email": "weak2@example.com",
+            "username": "weakuser2",
+            "password": "Pass1",
+            "is_active": True
+        }
+    )
+    assert response.status_code == 422
+    
+    # No numbers
+    response = client.post(
+        "/api/v1/users/",
+        json={
+            "email": "weak3@example.com",
+            "username": "weakuser3",
+            "password": "PasswordOnly",
+            "is_active": True
+        }
+    )
+    assert response.status_code == 422
+
+def test_create_user_with_harmful_chars_in_username(client):
+    """Test that harmful characters are sanitized from username"""
+    response = client.post(
+        "/api/v1/users/",
+        json={
+            "email": "sanitized@example.com",
+            "username": "user<script>name",
+            "password": "SecurePass123",
+            "is_active": True
+        }
+    )
+    assert response.status_code == 201
+    data = response.json()
+    # Harmful characters should be removed
+    assert "<" not in data["username"]
+    assert ">" not in data["username"]
+    assert data["username"] == "userscriptname"

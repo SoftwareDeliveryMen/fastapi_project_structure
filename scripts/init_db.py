@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal, engine
 from app.models.user import Base
 from app.core.security import get_password_hash
+from app.utils.helpers import sanitize_string
 
 def init_db():
     """Create tables and add initial data"""
